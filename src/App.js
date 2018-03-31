@@ -153,7 +153,7 @@ class TokenVerification extends Component {
       )
     }
 
-    if (this.state.success === false) {
+    if (this.state.failure === true) {
       return (
         <Redirect to="/verify/failure" />
       )
