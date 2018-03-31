@@ -195,15 +195,17 @@ const VerifyFailure = () => (
 
 const App = () => (
   <Router>
-    <div>
-      <Route exact path="/" component={Register} />
-      <Route exact path="/register/success" component={RegisterSuccess} />
-      <Switch>
-        <Route exact path="/verify/success" component={VerifySuccess} />
-        <Route exact path="/verify/failure" component={VerifyFailure} />
-        <Route path="/verify/:token" component={Verify} />
-      </Switch>
-    </div>
+    <section className="section">
+      <div className="container">  
+        <Route exact path="/" component={Register} />
+        <Route exact path="/register/success" component={RegisterSuccess} />
+        <Switch>
+          <Route exact path="/verify/success" component={VerifySuccess} />
+          <Route exact path="/verify/failure" component={VerifyFailure} />
+          <Route path="/verify/:token" component={Verify} />
+        </Switch>
+      </div>
+    </section>
   </Router>
 )
 
