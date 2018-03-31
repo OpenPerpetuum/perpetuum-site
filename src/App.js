@@ -30,8 +30,13 @@ class RegistrationForm extends Component {
     })
     .then(response => {
       if (response.status === 201) {
+        this.setState({
+          success: true,
+        });
+
         return {};
       }
+
       return response.json();
     })
     .then(json => {
@@ -39,13 +44,7 @@ class RegistrationForm extends Component {
         this.setState({
           validation: json.validation_messages
         });
-
-        return;
       }
-
-      this.setState({
-        success: true,
-      });
     });
   }
   
@@ -82,13 +81,10 @@ class Input extends Component {
     for (let prop in validation[name]) {
       return validation[name][prop];
     }
-
-    return;
   }
 
   render() {
-    var message = this.handleValidation();
-    console.log(message);
+    var warning = this.handleValidation();
     return (
       <div className="field">
         <label className="label">{this.props.label}</label>
@@ -104,15 +100,15 @@ class Input extends Component {
               <i className="fas fa-envelope"></i>
             </span>
           }
-          {message &&
+          {warning &&
             <span className="icon is-small is-right">
               <i className="fas fa-exclamation-triangle"></i>
             </span>
           }
         </div>
-        {message &&
-            <p className="help is-danger">{message}</p>
-          }
+        {warning &&
+          <p className="help is-danger">{warning}</p>
+        }
       </div>
     );
   }
