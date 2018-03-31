@@ -1,13 +1,23 @@
 import React, { Component } from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Redirect
+} from 'react-router-dom';
 // import './App.css';
 // import logo from './logo.svg';
 
-const API_URL = 'http://api.openperpetuum.com';
+// const API_URL = 'http://api.openperpetuum.com';
+const API_URL = 'http://perpetuum-api.localhost';
 
 class RegistrationForm extends Component {
   constructor() {
     super();
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.state = {
+      validation: [],
+      success: false,
+    };
   }
 
   handleSubmit(event) {
@@ -18,20 +28,38 @@ class RegistrationForm extends Component {
       method: 'POST',
       body: data
     })
-    .then(function(response) {
+    .then(response => {
+      if (response.status === 201) {
+        return {};
+      }
       return response.json();
     })
-    .then(function(json) {
-      console.log(json);
+    .then(json => {
+      if (json.hasOwnProperty('validation_messages')) {
+        this.setState({
+          validation: json.validation_messages
+        });
+
+        return;
+      }
+
+      this.setState({
+        success: true,
+      });
     });
   }
-
+  
   render() {
+    if (this.state.success === true) {
+      return (
+        <Redirect to="/register/success" />
+      )
+    }
     return (
       <form onSubmit={this.handleSubmit}>
-        <Input type="text" name="email" label="Email" icon="envelope" />
-        <Input type="password" name="password" label="Password" />
-        <Input type="password" name="password-repeat" label="Confirm password" />
+        <Input type="text" name="email" label="Email" icon="envelope" validation={this.state.validation} />
+        <Input type="password" name="password" label="Password" validation={this.state.validation} />
+        <Input type="password" name="password-repeat" label="Confirm password" validation={this.state.validation} />
         <div className="field is-grouped">
           <div className="control">
             <button className="button is-link">Submit</button>
@@ -43,15 +71,32 @@ class RegistrationForm extends Component {
 }
 
 class Input extends Component {
+  handleValidation() {
+    const validation = this.props.validation;
+    const name = this.props.name;
+    console.log(validation);
+    if (validation.hasOwnProperty(name) === false) {
+      return;
+    }
+
+    for (let prop in validation[name]) {
+      return validation[name][prop];
+    }
+
+    return;
+  }
+
   render() {
+    var message = this.handleValidation();
+    console.log(message);
     return (
       <div className="field">
         <label className="label">{this.props.label}</label>
         <div className="control has-icons-left has-icons-right">
           <input 
-            className="input" 
+            className={"input " + (message ? "is-danger" : "")}
             name={this.props.name}
-            type={this.props.type} 
+            type={this.props.type}
             placeholder={this.props.placeholder}
           />
           {this.props.icon &&
@@ -59,23 +104,39 @@ class Input extends Component {
               <i className="fas fa-envelope"></i>
             </span>
           }
+          {message &&
+            <span className="icon is-small is-right">
+              <i className="fas fa-exclamation-triangle"></i>
+            </span>
+          }
         </div>
+        {message &&
+            <p className="help is-danger">{message}</p>
+          }
       </div>
     );
   }
 }
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header>
-          {/* <img src={logo} className="App-logo" alt="logo" /> */}
-        </header>
-        <RegistrationForm />
-      </div>
-    );
-  }
-}
+const Register = () => (
+  <div>
+    <RegistrationForm />
+  </div>
+)
+
+const RegisterSuccess = () => (
+  <div>
+    <h1>Success!</h1>
+  </div>
+)
+
+const App = () => (
+  <Router>
+    <div>
+      <Route exact path="/" component={Register}/>
+      <Route exact path="/register/success" component={RegisterSuccess}/>
+    </div>
+  </Router>
+)
 
 export default App;
