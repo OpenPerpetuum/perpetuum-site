@@ -9,7 +9,6 @@ import {
 // import logo from './logo.svg';
 
 const API_URL = 'http://api.openperpetuum.com';
-// const API_URL = 'http://perpetuum-api.localhost';
 
 class RegistrationForm extends Component {
   constructor() {
