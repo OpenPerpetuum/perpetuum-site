@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import {
   BrowserRouter as Router,
   Route,
-  Redirect
+  Redirect,
+  Switch,
 } from 'react-router-dom';
 // import './App.css';
 // import logo from './logo.svg';
 
-// const API_URL = 'http://api.openperpetuum.com';
-const API_URL = 'http://perpetuum-api.localhost';
+const API_URL = 'http://api.openperpetuum.com';
+// const API_URL = 'http://perpetuum-api.localhost';
 
 class RegistrationForm extends Component {
   constructor() {
@@ -54,6 +55,7 @@ class RegistrationForm extends Component {
         <Redirect to="/register/success" />
       )
     }
+
     return (
       <form onSubmit={this.handleSubmit}>
         <Input type="text" name="email" label="Email" icon="envelope" validation={this.state.validation} />
@@ -73,7 +75,7 @@ class Input extends Component {
   handleValidation() {
     const validation = this.props.validation;
     const name = this.props.name;
-    console.log(validation);
+
     if (validation.hasOwnProperty(name) === false) {
       return;
     }
@@ -90,7 +92,7 @@ class Input extends Component {
         <label className="label">{this.props.label}</label>
         <div className="control has-icons-left has-icons-right">
           <input 
-            className={"input " + (message ? "is-danger" : "")}
+            className={"input " + (warning ? "is-danger" : "")}
             name={this.props.name}
             type={this.props.type}
             placeholder={this.props.placeholder}
@@ -114,6 +116,56 @@ class Input extends Component {
   }
 }
 
+class TokenVerification extends Component {
+  constructor() {
+    super();
+    this.state = {
+      success: false,
+      failure: false,
+    };
+  }
+
+  handleVerification() {
+    fetch(API_URL+'/onboarding/verify/' + this.props.token, {
+      method: 'POST',
+    })  
+    .then(response => {
+      if (response.status === 204) {
+        this.setState({
+          success: true,
+        });
+      }
+      if (response.status === 404) {
+        this.setState({
+          failure: true,
+        });
+      }
+    });
+  }
+
+  render() {
+    if (this.state.success === false && this.state.failure === false) {
+      this.handleVerification();
+    }
+
+    if (this.state.success === true) {
+      return (
+        <Redirect to="/verify/success" />
+      )
+    }
+
+    if (this.state.success === false) {
+      return (
+        <Redirect to="/verify/failure" />
+      )
+    }
+
+    return (
+      <h1>Checking...</h1>
+    );
+  }
+}
+
 const Register = () => (
   <div>
     <RegistrationForm />
@@ -122,15 +174,36 @@ const Register = () => (
 
 const RegisterSuccess = () => (
   <div>
-    <h1>Success!</h1>
+    <h1>You've been registered. We have sent you an email with a link to verify your email address.</h1>
+  </div>
+)
+
+const Verify = ({match}) => (
+  <TokenVerification token={match.params.token} />
+)
+
+const VerifySuccess = () => (
+  <div>
+    <h1>We've successfully verified your email address. Thanks!</h1>
+  </div>
+)
+
+const VerifyFailure = () => (
+  <div>
+    <h1>We could not find this verification link. Maybe you have already verified your registration?</h1>
   </div>
 )
 
 const App = () => (
   <Router>
     <div>
-      <Route exact path="/" component={Register}/>
-      <Route exact path="/register/success" component={RegisterSuccess}/>
+      <Route exact path="/" component={Register} />
+      <Route exact path="/register/success" component={RegisterSuccess} />
+      <Switch>
+        <Route exact path="/verify/success" component={VerifySuccess} />
+        <Route exact path="/verify/failure" component={VerifyFailure} />
+        <Route path="/verify/:token" component={Verify} />
+      </Switch>
     </div>
   </Router>
 )
