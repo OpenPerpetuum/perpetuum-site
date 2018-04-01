@@ -17,6 +17,7 @@ class RegistrationForm extends Component {
     this.state = {
       validation: [],
       success: false,
+      error: null,
     };
   }
 
@@ -26,7 +27,10 @@ class RegistrationForm extends Component {
 
     fetch(API_URL+'/onboarding/register', {
       method: 'POST',
-      body: data
+      body: data,
+      headers: new Headers({
+        "Accept": "application/*+json",
+      }),
     })
     .then(response => {
       if (response.status === 201) {
@@ -44,6 +48,13 @@ class RegistrationForm extends Component {
         this.setState({
           validation: json.validation_messages
         });
+        
+        return;
+      }
+      if (json.hasOwnProperty('detail')) {
+        this.setState({
+          error: json.detail,
+        });
       }
     });
   }
@@ -54,18 +65,27 @@ class RegistrationForm extends Component {
         <Redirect to="/register/success" />
       )
     }
-
+    var error = this.state.error;
     return (
-      <form onSubmit={this.handleSubmit}>
-        <Input type="text" name="email" label="Email" icon="envelope" validation={this.state.validation} />
-        <Input type="password" name="password" label="Password" validation={this.state.validation} />
-        <Input type="password" name="password-repeat" label="Confirm password" validation={this.state.validation} />
-        <div className="field is-grouped">
-          <div className="control">
-            <button className="button is-link">Submit</button>
+      <div>
+        {error &&
+          <article className="message is-danger">
+            <div className="message-body">
+              {error}
+            </div>
+          </article>
+        }
+        <form onSubmit={this.handleSubmit}>
+          <Input type="text" name="email" label="Email" icon="envelope" validation={this.state.validation} />
+          <Input type="password" name="password" label="Password" icon="lock" validation={this.state.validation} />
+          <Input type="password" name="password-repeat" label="Confirm password" icon="redo" validation={this.state.validation} />
+          <div className="field is-grouped">
+            <div className="control">
+              <button className="button is-link">Submit</button>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     )
   }
 }
@@ -98,7 +118,7 @@ class Input extends Component {
           />
           {this.props.icon &&
             <span className="icon is-small is-left">
-              <i className="fas fa-envelope"></i>
+              <i className={"fas fa-" + this.props.icon}></i>
             </span>
           }
           {warning &&
@@ -127,6 +147,9 @@ class TokenVerification extends Component {
   handleVerification() {
     fetch(API_URL+'/onboarding/verify/' + this.props.token, {
       method: 'POST',
+      headers: new Headers({
+        "Accept": "application/*+json",
+      }),
     })  
     .then(response => {
       if (response.status === 204) {
