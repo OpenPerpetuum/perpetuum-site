@@ -1,1 +1,1 @@
-export const apiUrl = "http://api.openperpetuum.com";
+export const apiUrl = "https://api.openperpetuum.com";
