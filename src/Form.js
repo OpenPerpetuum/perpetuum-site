@@ -1,11 +1,9 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { PureComponent } from 'react';
 import { Redirect } from 'react-router-dom';
-import Input from './Input';
 import { apiUrl } from './config';
 require('formdata-polyfill'); // FormData.get() on iOS
 
-export default class Form extends Component {
+export default class Form extends PureComponent {
   state = {
     validation: [],
     success: false,
@@ -93,6 +91,7 @@ export default class Form extends Component {
     }
     const error = this.state.error;
     const loading = this.state.loading;
+    const clonedChildren = React.Children.map(this.props.children, (child) => React.cloneElement(child, { validation: this.state.validation }));
 
     return (
       <div>
@@ -104,7 +103,7 @@ export default class Form extends Component {
           </article>
         }
         <form onSubmit={this.handleSubmit} onClick={this.handleClick}>
-          {this.props.children}
+          {clonedChildren}
           <div className="field is-grouped">
             <div className="control">
               <button className={"button is-link " + (loading ? "is-loading" : "")} disabled={loading}>{this.props.actionLabel}</button>
