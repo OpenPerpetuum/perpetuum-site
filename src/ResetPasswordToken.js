@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import { apiUrl } from './config';
+import ResetPasswordForm  from './ResetPasswordForm';
 
-export default class TokenVerify extends Component {
+export default class ResetPasswordToken extends Component {
   state = {
     success: false,
     failure: false,
   };
 
   handleVerification() {
-    fetch(apiUrl + '/onboarding/verify/' + this.props.token, {
+    fetch(apiUrl + '/onboarding/reset/' + this.props.token, {
       method: 'POST',
       headers: new Headers({
         "Accept": "application/*+json",
@@ -38,13 +39,13 @@ export default class TokenVerify extends Component {
   render() {
     if (this.state.success === true) {
       return (
-        <Redirect to="/verify/success" />
+        <ResetPasswordForm token={this.props.token} />
       )
     }
 
     if (this.state.failure === true) {
       return (
-        <Redirect to="/verify/failure" />
+        <Redirect to="/reset-password/failure" />
       )
     }
 

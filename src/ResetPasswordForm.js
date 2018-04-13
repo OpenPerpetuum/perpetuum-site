@@ -5,8 +5,9 @@ import Input from './Input';
 export default class ResetPasswordForm extends Component {
   render () {
     return (
-      <Form action="/onboarding/reset" actionLabel="Send reset link" success="/reset-password/success">
-        <Input type="text" name="email" label="Email" icon="envelope" validation />
+      <Form action={"/onboarding/reset/" + this.props.token} actionLabel="Reset password" success="/reset-password/success">
+        <Input type="password" name="password" label="New password" icon="key" validation />
+        <Input type="password" name="password-repeat" label="Confirm password" icon="redo" validation />
       </Form>
     );
   }
